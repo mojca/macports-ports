@@ -1,6 +1,6 @@
 --- Gate.cc.orig
 +++ Gate.cc
-@@ -389,6 +389,7 @@ int main( int argc, char* argv[] )
+@@ -405,6 +405,7 @@ int main( int argc, char* argv[] )
  #ifdef G4UI_USE
      if (ui) // Launching interactive mode // Qt
        {
