@@ -1,0 +1,73 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=2:ts=2:sts=2
+
+PortSystem          1.0
+PortGroup           python      1.0
+PortGroup           wxWidgets   1.0
+
+name                py-wxpython-4.0
+version             4.0.1
+wxWidgets.use       wxWidgets-3.0
+python.rootname     wxPython
+categories-append   graphics devel
+license             wxwidgets-3.1
+platforms           darwin
+maintainers         {mojca @mojca} openmaintainer
+
+description         Cross platform GUI toolkit for Python, \"Phoenix\" version
+long_description    wxPython is a GUI toolkit for the Python programming \
+                    language. It allows Python programmers to create \
+                    programs with a robust, highly functional graphical \
+                    user interface, simply and easily. It is implemented \
+                    as a Python extension module (native code) that wraps \
+                    the wxWidgets cross platform GUI library, written in C++.
+
+homepage            http://www.wxpython.org/
+
+master_sites        https://pypi.python.org/packages/a4/4a/d35b19f8c21b414ece2b3dc02dcf8cb0d45d6fe5aacf56f7ca0b7c66ac58
+distname            ${python.rootname}-${version}
+# inconsistent version number, but no idea what would make more sense
+# maybe setting it to [py-]wxpython?
+dist_subdir         wxWidgets/${version}
+
+checksums           md5     a56ece3363da3949dd0f30c45cc21631 \
+                    rmd160  7d3c6d563a6785c26c8edef5b626ca8415e7f63d \
+                    sha256  f8f2ac1a75368b9b103259addc77f4e3dfe729c6d70aa1fd0b7e9c5b6075c710 \
+                    size    67918134
+
+python.versions     27 35 36
+python.default_version 36
+
+# dependencies:
+# py36-six
+#
+# build and test requirements
+# appdirs setuptools six wheel twine sphinx requests pytest pytest-xdist pytest-timeout numpy
+
+if {${name} ne ${subport}} {
+    conflicts       py${python.version}-wxpython-2.8 \
+                    py${python.version}-wxpython-3.0
+
+    depends_lib-append \
+                    port:${wxWidgets.port}
+
+    # TODO: stuff that doesn't work
+    # build.env-append  WX_CONFIG="${wxWidgets.wxconfig}"
+    # build.env-append  CXXFLAGS="${configure.universal_cxxflags} -std=c++11"
+    # build.cmd         ${python.bin} ... WX_CONFIG="${wxWidgets.wxconfig}"
+    # configure.cxxflags-append -std=c++11
+    # configure.cxx_archflags "-std=c++11"
+    build.env-append PATH="${wxWidgets.wxdir}:$env(PATH)"
+
+    build.cmd       ${python.bin} ./build.py build_py   --use_syswx --verbose flag
+    destroot.cmd    ${python.bin} ./build.py install_py --use_syswx --verbose flag
+
+    # [python_get_defaults setup_args]
+
+    # --prefix=PREFIX       Prefix value to pass to the wx build.
+    # --destdir=DESTDIR     Installation root for wxWidgets, files will go to
+    #                       {destdir}/{prefix}
+
+    livecheck.type  none
+} else {
+    livecheck.type  pypi
+}
